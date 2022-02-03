@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import CheckConstraint, F, Q, UniqueConstraint
 
 User = get_user_model()
 
@@ -59,7 +60,7 @@ class Post(models.Model):
     )
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ('-pub_date',)
         verbose_name_plural = 'Посты'
         verbose_name = 'Пост'
 
@@ -91,7 +92,7 @@ class Comment(models.Model):
         verbose_name='Активен')
 
     class Meta:
-        ordering = ['-created']
+        ordering = ('-created',)
         verbose_name_plural = 'Коментарии'
         verbose_name = 'Коментарий'
 
@@ -113,11 +114,9 @@ class Follow(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'author'],
-                                    name='following_unique')
+            UniqueConstraint(fields=['user', 'author'], name='unique_follow'),
+            CheckConstraint(check=~Q(user=F('author')), name='user_not_author'),
         ]
-        verbose_name_plural = 'Подписки'
-        verbose_name = 'Подписка'
 
     def __str__(self):
         return f'{self.user} подписался на {self.author}'
