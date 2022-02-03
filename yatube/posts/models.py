@@ -114,8 +114,12 @@ class Follow(models.Model):
 
     class Meta:
         constraints = [
-            UniqueConstraint(fields=['user', 'author'], name='unique_follow'),
-            CheckConstraint(check=~Q(user=F('author')), name='user_not_author'),
+            UniqueConstraint(
+                fields=['user', 'author'],
+                name='unique_follow'),
+            CheckConstraint(
+                check=~Q(user=F('author')),
+                name='user_not_author'),
         ]
 
     def __str__(self):
